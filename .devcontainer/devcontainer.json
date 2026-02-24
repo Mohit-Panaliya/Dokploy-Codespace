@@ -48,7 +48,7 @@
 		}
 	},
 	"remoteUser": "node",
-	"workspaceFolder": "/workspaces/dokploy-codespaces",
+	"workspaceFolder": "/workspaces/Dokploy-Codespace",
 	"runArgs": ["--name", "dokploy-devcontainer"],
-	"postStartCommand": "cd /workspaces/dokploy-codespaces && chmod +x deploy-codespaces.sh && ./deploy-codespaces.sh"
+	"postStartCommand": "cd /workspaces/Dokploy-Codespace && chmod +x deploy-codespaces.sh && ./deploy-codespaces.sh"
 }
