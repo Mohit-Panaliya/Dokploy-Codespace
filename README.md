@@ -1,156 +1,61 @@
-# Dokploy Deployment on GitHub Codespaces
+# Dokploy Codespace Setup
 
-## Overview
+This folder contains the complete setup scripts and configuration to run Dokploy in GitHub Codespaces.
 
-This is a minimal configuration project for deploying Dokploy on GitHub Codespaces. Instead of including the entire Dokploy source code, this project provides scripts and configuration to clone and set up Dokploy automatically.
+## What's Included
 
-## Prerequisites
+- **deploy.sh** - Main deployment script that automatically:
+  1. Clones the Dokploy repository
+  2. Applies GitHub Codespaces compatibility fixes
+  3. Installs dependencies
+  4. Sets up the application (PostgreSQL, Redis, Traefik)
+  5. Exposes Docker Swarm service ports
+  6. Clears Next.js cache
+  7. Runs database migrations
+  8. Starts the development server
 
-- GitHub account with Codespaces enabled
-- Internet connection (for cloning the Dokploy repository)
+## Key Fixes Applied
 
-## Quick Start
+### PostgreSQL Connection
+The original code tries to connect to `dokploy-postgres` which only works within Docker Swarm networking. For codespaces, we use `127.0.0.1` instead.
 
-### Option 1: Using GitHub.dev (Recommended for Small Changes)
+### Redis Connection  
+Similarly, Redis is configured to use `127.0.0.1` instead of `dokploy-redis`.
 
-1. **Open this repository in GitHub.dev**
-2. **Click the "Source Control" icon** on the left sidebar
-3. **Commit your changes** if you made any modifications
-4. **Click "Sync Changes"** to push to your forked repository
-5. **From your forked repository on GitHub.com**, click "Code" → "Open with Codespaces"
+### Docker Swarm Ports
+The Docker Swarm services (PostgreSQL and Redis) need their ports exposed to the host for the application to connect.
 
-### Option 2: Directly from GitHub.com
+## Usage
 
-### Step 1: Create Your Codespace
-
-1. **Fork this repository** to your GitHub account
-2. Go to your forked repository
-3. Click the green "Code" button
-4. Select "Open with Codespaces"
-5. Click "New codespace"
-6. Choose a machine type (**2-core or higher recommended**)
-7. Wait for the codespace to initialize (2-5 minutes)
-
-### Step 2: Run the Deployment Script
-
-Once your codespace is ready:
-
+### Option 1: Run manually
 ```bash
-# Make the script executable
-chmod +x deploy-codespaces.sh
-
-# Run the deployment
-./deploy-codespaces.sh
+cd dokploy-codespace-setup
+chmod +x deploy.sh
+./deploy.sh
 ```
 
-The script will:
-- ✅ Check if you're in a GitHub Codespace
-- ✅ Clone the Dokploy repository (if not already present)
-- ✅ Install all dependencies
-- ✅ Set up the application (database, configuration)
+### Option 2: Add to Codespace .devcontainer
+Add this to your `.devcontainer/devcontainer.json`:
 
-### Step 3: Start the Development Server
-
-```bash
-cd dokploy
-pnpm dokploy:dev
+```json
+{
+  "postCreateCommand": "cd dokploy-codespace-setup && ./deploy.sh"
+}
 ```
 
-### Step 4: Access Dokploy
+## After Setup
 
-- Click the "Ports" tab on the bottom right
-- Find port 3000 (labeled "Dokploy App")
-- Click "Open in Browser"
+The application will be available at:
+- **URL**: http://localhost:3000
 
-## Project Structure
+## Troubleshooting
 
-```
-dokploy-codespaces/
-├── .devcontainer/          # GitHub Codespaces configuration
-│   ├── devcontainer.json  # Dev container configuration
-│   └── Dockerfile         # Dockerfile for the dev container
-├── .github/
-│   └── workflows/
-│       └── deploy-codespaces.yml  # GitHub Action for validation
-├── deploy-codespaces.sh    # Deployment script
-├── .gitignore              # Git ignore rules
-└── README.md               # This file
-```
+If you encounter issues:
+1. Make sure Docker is running
+2. Check that the ports are exposed: `docker service ls`
+3. Verify database is accessible: `nc -zv 127.0.0.1 5432`
 
-## Configuration Details
+## Files Modified from Original
 
-### Dev Container Features
-
-- **Node.js 20** - JavaScript runtime
-- **pnpm** - Package manager
-- **Docker-in-Docker** - For container management
-- **Git** - Version control
-- **Go 1.20** - For monitoring service
-
-### Forwarded Ports
-
-- **3000** - Dokploy web application
-- **5432** - PostgreSQL database
-- **6379** - Redis cache
-
-## Customization
-
-### Modifying the Script
-
-Edit `deploy-codespaces.sh` to customize the deployment:
-
-- Change the repository URL: `https://github.com/Dokploy/dokploy.git`
-- Modify installation steps
-- Adjust configuration options
-
-### Environment Variables
-
-Create a `.env` file in the `dokploy` directory:
-
-```env
-DATABASE_URL="postgresql://username:password@localhost:5432/dokploy"
-REDIS_URL="redis://localhost:6379"
-NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-```
-
-## GitHub Action
-
-The `.github/workflows/deploy-codespaces.yml` file validates the configuration:
-- Checks if the dev container configuration is valid
-- Verifies the deployment script is executable
-- Ensures all required files are present
-
-## Limitations
-
-- **Codespace Idle Time**: Codespaces auto-suspend after 30 minutes
-- **Storage Limits**: Free tier has 15GB storage limit
-- **Performance**: Depends on the selected machine type
-- **Data Persistence**: Changes are not persistent across codespace lifetime
-
-## Best Practices
-
-### For Development
-
-1. Commit changes to your forked repository
-2. Use branches for experiments
-3. Monitor resource usage
-4. Clean up unused codespaces
-
-### For Production
-
-**GitHub Codespaces is for development only**. For production deployment:
-1. Self-host on a cloud provider (AWS, DigitalOcean, Vultr)
-2. Use Docker Compose or Kubernetes
-3. Set up persistent storage
-4. Implement security measures
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Support
-
-- [Dokploy Documentation](https://dokploy.com/docs)
-- [GitHub Codespaces Documentation](https://docs.github.com/en/codespaces)
-- [Dokploy Issues](https://github.com/Dokploy/dokploy/issues)
+- `packages/server/src/db/constants.ts` - PostgreSQL connection fix
+- `apps/dokploy/server/queues/redis-connection.ts` - Redis connection fix
