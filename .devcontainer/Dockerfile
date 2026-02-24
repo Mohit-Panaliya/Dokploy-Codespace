@@ -21,5 +21,11 @@ RUN wget -O go.tgz https://go.dev/dl/go1.20.14.linux-amd64.tar.gz && \
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 
+# Install build dependencies to avoid node-pty installation issues
+RUN apt-get install -y \
+    build-essential \
+    python3 \
+    libsecret-1-dev
+
 # Set up workspace
 WORKDIR /workspaces/dokploy-codespaces
