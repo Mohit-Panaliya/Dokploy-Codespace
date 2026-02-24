@@ -11,6 +11,16 @@ This is a minimal configuration project for deploying Dokploy on GitHub Codespac
 
 ## Quick Start
 
+### Option 1: Using GitHub.dev (Recommended for Small Changes)
+
+1. **Open this repository in GitHub.dev**
+2. **Click the "Source Control" icon** on the left sidebar
+3. **Commit your changes** if you made any modifications
+4. **Click "Sync Changes"** to push to your forked repository
+5. **From your forked repository on GitHub.com**, click "Code" → "Open with Codespaces"
+
+### Option 2: Directly from GitHub.com
+
 ### Step 1: Create Your Codespace
 
 1. **Fork this repository** to your GitHub account
