@@ -28,4 +28,4 @@ RUN apt-get install -y \
     libsecret-1-dev
 
 # Set up workspace
-WORKDIR /workspaces/dokploy-codespaces
+WORKDIR /workspaces/Dokploy-Codespace
